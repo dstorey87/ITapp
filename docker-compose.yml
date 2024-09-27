@@ -1,6 +1,17 @@
 services:
+  php-apache:
+    image: php:7.4-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/var/www/html
+    environment:
+      - APACHE_LOG_DIR=/var/log/apache2
+    depends_on:
+      - db
+
   db:
-    image: mariadb
+    image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: your_password
       MYSQL_DATABASE: eve_online
@@ -8,13 +19,6 @@ services:
       MYSQL_PASSWORD: your_password
     volumes:
       - db_data:/var/lib/mysql
-
-  php-apache:
-    build: .  # Specify build context for Dockerfile
-    volumes:
-      - ./html:/var/www/html
-    ports:
-      - "8080:80"
 
 volumes:
   db_data:

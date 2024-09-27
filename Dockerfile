@@ -1,13 +1,22 @@
 FROM php:7.4-apache
 
 # Install required PHP extensions
-RUN docker-php-ext-install mysqli
+RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Enable the mysqli extension
-RUN docker-php-ext-enable mysqli
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
 
-# Copy your php.ini if you have one (uncomment and adjust the path if needed)
-# COPY path/to/your/php.ini /usr/local/etc/php/
-
-# Make sure the document root is set properly
+# Set the working directory
 WORKDIR /var/www/html
+
+# Copy the application source code to the container
+COPY ./html /var/www/html
+
+# Set file permissions
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Apache in the foreground
+CMD ["apache2-foreground"]
