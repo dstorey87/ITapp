@@ -3,11 +3,19 @@ FROM php:7.4-apache
 # Install required PHP extensions
 RUN docker-php-ext-install mysqli
 
-# Enable the mysqli extension
-RUN docker-php-ext-enable mysqli
+# Enable Apache modules
+RUN a2enmod rewrite
 
-# Copy your php.ini if you have one (uncomment and adjust the path if needed)
-# COPY path/to/your/php.ini /usr/local/etc/php/
+# Set ServerName to avoid the warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Make sure the document root is set properly
-WORKDIR /var/www/html
+# Copy custom VirtualHost configuration
+COPY ./my-php.conf /etc/apache2/sites-available/000-default.conf
+
+# Copy the .htaccess file to ensure rewrite rules are persistent
+COPY ./html/.htaccess /var/www/html/.htaccess
+
+# Expose port 80
+EXPOSE 80
+
+CMD ["apache2-foreground"]

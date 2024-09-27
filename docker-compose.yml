@@ -1,4 +1,13 @@
 services:
+  php-apache:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/var/www/html
+      - ./logs:/var/log/apache2    # Maps the logs directory
+    restart: always
+
   db:
     image: mariadb
     environment:
@@ -8,13 +17,6 @@ services:
       MYSQL_PASSWORD: your_password
     volumes:
       - db_data:/var/lib/mysql
-
-  php-apache:
-    build: .  # Specify build context for Dockerfile
-    volumes:
-      - ./html:/var/www/html
-    ports:
-      - "8080:80"
 
 volumes:
   db_data:
