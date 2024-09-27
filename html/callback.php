@@ -5,6 +5,7 @@ session_start();
 $clientID = '523dcd00cdfe40e8b11a455adf02fc65';
 $clientSecret = 'ZbQiT940vfmxTun4riqZjGNw2imohWgiehn5cEaB';
 $redirectUri = 'http://localhost:8080/callback';
+file_put_contents('callback_log.txt', print_r($_GET, true));
 
 // Check if we have an authorization code
 if (isset($_GET['code'])) {

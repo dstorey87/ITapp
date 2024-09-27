@@ -7,6 +7,29 @@ session_start();
 // Include database connection
 include('db.php');
 
+// Function to fetch user data
+function getUserData($accessToken) {
+    $url = "https://esi.evetech.net/verify/";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $accessToken,
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($error) {
+        die("Error retrieving user data: $error");
+    }
+
+    return json_decode($response, true);
+}
+
 // Check for OAuth2 login
 if (!isset($_SESSION['access_token'])) {
     header('Location: oauth.php');

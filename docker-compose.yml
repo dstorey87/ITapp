@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   php-apache:
     build: .
@@ -7,13 +5,11 @@ services:
       - "8080:80"
     volumes:
       - ./html:/var/www/html
-    environment:
-      - APACHE_LOG_DIR=/var/log/apache2
-    depends_on:
-      - db
+      - ./logs:/var/log/apache2    # Maps the logs directory
+    restart: always
 
   db:
-    image: mariadb:latest
+    image: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: your_password
       MYSQL_DATABASE: eve_online

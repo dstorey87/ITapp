@@ -1,20 +1,21 @@
 FROM php:7.4-apache
 
-# Install PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# Install required PHP extensions
+RUN docker-php-ext-install mysqli
 
-# Enable Apache mod_rewrite and set ServerName to avoid warning
+# Enable Apache modules
 RUN a2enmod rewrite
+
+# Set ServerName to avoid the warning
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Copy application files to container
-COPY ./html /var/www/html
+# Copy custom VirtualHost configuration
+COPY ./my-php.conf /etc/apache2/sites-available/000-default.conf
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+# Copy the .htaccess file to ensure rewrite rules are persistent
+COPY ./html/.htaccess /var/www/html/.htaccess
 
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in the foreground
 CMD ["apache2-foreground"]
