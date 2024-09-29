@@ -1,0 +1,15 @@
+# Ignore log files and directories
+logs
+*.log
+
+# Ignore git directory
+.git
+
+# Ignore database backups or large files (adjust based on your project)
+*.sql
+*.tar.gz
+*.zip
+
+# Ignore system files
+.DS_Store
+Thumbs.db
