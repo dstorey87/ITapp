@@ -1,17 +1,29 @@
 <?php
+// EveOnlineCapitalProduction/html/includes/oauth.php
+
 session_start();
-include 'includes/logging.php';  // Logging function
+include_once __DIR__ . '/logging.php';  // Ensure the correct path to logging.php
+
+if (!function_exists('log_message')) {
+    die("Error: log_message function is not defined. Please check the logging.php file.");
+}
+
 log_message("OAuth script started");
 
 // Your OAuth2 configuration
 $clientID = '523dcd00cdfe40e8b11a455adf02fc65';
 $clientSecret = 'ZbQiT940vfmxTun4riqZjGNw2imohWgiehn5cEaB';
-$redirectUri = 'http://localhost:8080/callback';
+$redirectUri = 'http://localhost:8080/includes/callback.php';
 $scope = 'publicData';  // Adjust scopes as needed
 
 // Generate a random state string to prevent CSRF attacks
-$state = bin2hex(random_bytes(16));
-$_SESSION['oauth2_state'] = $state;
+try {
+    $state = bin2hex(random_bytes(16));
+    $_SESSION['oauth2_state'] = $state;
+} catch (Exception $e) {
+    log_message("Error generating state: " . $e->getMessage());
+    die("Error generating state: " . $e->getMessage());
+}
 
 // Check if we have an authorization code
 if (isset($_GET['code'])) {
@@ -43,33 +55,37 @@ if (isset($_GET['code'])) {
         curl_close($ch);
 
         if ($error) {
-            log_message("Error retrieving access token: $error");
-            die("Error retrieving access token: $error");
+            log_message("Curl error: " . $error);
+            die("Curl error: " . $error);
         }
 
-        // Decode the response
         $responseData = json_decode($response, true);
-        log_message("Access token response: " . print_r($responseData, true));
-
-        // Store the access token in the session
         if (isset($responseData['access_token'])) {
             $_SESSION['access_token'] = $responseData['access_token'];
-            log_message("Access token stored in session. Redirecting to index.php.");
-            header('Location: index.php');  // Redirect to index.php
+            log_message("Access token received and stored. Redirecting to index.php.");
+            header('Location: ../index.php');
             exit();
         } else {
-            log_message("Error retrieving access token: " . print_r($responseData, true));
-            die("Error retrieving access token: " . print_r($responseData, true));
+            log_message("Error: Access token not received. Response: " . print_r($responseData, true));
+            die("Error: Access token not received.");
         }
     } else {
-        log_message("Invalid state parameter.");
-        die("Invalid state parameter.");
+        log_message("State verification failed.");
+        die("State verification failed.");
     }
 } else {
-    // Redirect user to EVE Online authorization page
-    $authUrl = "https://login.eveonline.com/v2/oauth/authorize?response_type=code&client_id={$clientID}&redirect_uri=" . urlencode($redirectUri) . "&scope={$scope}&state=" . urlencode($state);
-    log_message("Redirecting to EVE Online OAuth2 authorization page: $authUrl");
-    header("Location: $authUrl");
+    log_message("No authorization code received. Redirecting to OAuth provider...");
+
+    // Redirect to the OAuth provider's authorization endpoint
+    $authUrl = 'https://login.eveonline.com/v2/oauth/authorize?' . http_build_query([
+        'response_type' => 'code',
+        'client_id' => $clientID,
+        'redirect_uri' => $redirectUri,
+        'scope' => $scope,
+        'state' => $state,
+    ]);
+
+    header('Location: ' . $authUrl);
     exit();
 }
 ?>
