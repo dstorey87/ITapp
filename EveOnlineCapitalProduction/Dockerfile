@@ -1,3 +1,5 @@
+# EveOnlineCapitalProduction/Dockerfile
+
 # Use the official PHP image with Apache
 FROM php:7.4-apache
 
@@ -6,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     libpng-dev \
     mariadb-client \
-    && docker-php-ext-install pdo pdo_mysql gd
+    && docker-php-ext-install pdo pdo_mysql gd mysqli
 
 # Enable Apache's mod_rewrite for SEO-friendly URLs or pretty URLs
 RUN a2enmod rewrite

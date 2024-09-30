@@ -1,7 +1,8 @@
 <?php
-// db.php
+// EveOnlineCapitalProduction/html/includes/db.php
 
-$servername = "db";  // Ensure this is correctly set to the database container name
+<?php
+$servername = "db";  // Ensure this is correctly set the database container name
 $username = "eve_user";
 $password = "your_password";  // Use your actual database password here
 $dbname = "eve_online";
